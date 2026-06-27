@@ -3,20 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TERRA | Wildlife Gallery</title>
+    <title>TERRA — Wildlife Gallery</title>
     <style>
         :root {
-            --primary: #00ff88;
-            --accent: #00e1ff;
-            --bg-dark: #050b14;
-            --glass-bg: rgba(10, 25, 47, 0.4);
-            --glass-border: rgba(255, 255, 255, 0.08);
-            --text-light: #f3f4f6;
+            --primary: #00ffaa;
+            --accent: #00e5ff;
+            --bg-dark: #03070c;
+            --glass-bg: rgba(4, 10, 20, 0.4);
+            --glass-border: rgba(255, 255, 255, 0.05);
+            --text-muted: #64748b;
+            --text-light: #f8fafc;
         }
 
         * {
             margin: 0; padding: 0; box-sizing: border-box;
-            font-family: 'Segoe UI', sans-serif;
+            font-family: system-ui, -apple-system, sans-serif;
         }
 
         body {
@@ -24,167 +25,210 @@
             color: var(--text-light);
             min-height: 100vh;
             overflow-x: hidden;
+            letter-spacing: -0.01em;
         }
 
+        /* Ambient Light Background Vignette */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at 50% 10%, rgba(0, 229, 255, 0.02) 0%, transparent 60%);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* Navigation Grid Match */
         nav {
             position: fixed; top: 0; width: 100%; display: flex;
             justify-content: space-between; align-items: center;
-            padding: 1.5rem 5%; background: rgba(5, 11, 20, 0.7);
-            backdrop-filter: blur(12px); border-bottom: 1px solid var(--glass-border);
+            padding: 2rem 6%; background: linear-gradient(to bottom, rgba(3, 7, 12, 0.9), transparent);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
             z-index: 10;
         }
 
-        .logo {
-            font-size: 1.8rem; font-weight: 800; letter-spacing: 4px;
-            background: linear-gradient(45deg, var(--primary), var(--accent));
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-        }
+        .logo-container { display: flex; align-items: center; gap: 1rem; }
+        .logo { font-size: 1.25rem; font-weight: 800; letter-spacing: 7px; color: var(--text-light); }
+        .logo-dot { width: 6px; height: 6px; background: var(--primary); border-radius: 50%; box-shadow: 0 0 10px var(--primary); }
 
-        .nav-links { display: flex; list-style: none; gap: 2rem; }
-        .nav-links a { color: var(--text-light); text-decoration: none; font-weight: 500; transition: color 0.3s; position: relative; }
-        .nav-links a::after { content: ''; position: absolute; width: 0; height: 2px; bottom: -5px; left: 0; background-color: var(--primary); transition: width 0.3s; }
-        .nav-links a.active::after { width: 100%; }
+        .nav-links { display: flex; list-style: none; gap: 3rem; }
+        .nav-links a { color: var(--text-muted); text-decoration: none; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; transition: color 0.4s; }
+        .nav-links a:hover, .nav-links a.active { color: var(--text-light); }
 
-        /* Main Container */
+        /* Core Content Layout */
         main {
-            padding: 8rem 5% 4rem 5%;
+            padding: 9rem 6% 6rem 6%;
             position: relative;
             z-index: 2;
+            max-width: 1400px;
+            margin: 0 auto;
         }
 
         .header-title {
-            margin-bottom: 3rem;
-            text-align: center;
+            margin-bottom: 4rem;
+            text-align: left;
+            max-width: 600px;
         }
 
         .header-title h1 {
-            font-size: 3rem;
-            letter-spacing: 2px;
-            margin-bottom: 0.5rem;
+            font-size: 2.75rem;
+            letter-spacing: -0.02em;
+            margin-bottom: 1rem;
+            font-weight: 400;
+        }
+
+        .header-title h1 span {
+            font-weight: 700;
         }
 
         .header-title p {
-            color: #a0aec0;
+            color: var(--text-muted);
+            line-height: 1.6;
+            font-size: 1rem;
         }
 
-        /* Showcase Dynamic Grid */
+        /* Showcase Layout Grid */
         .gallery-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 2.5rem;
+            grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+            gap: 3rem;
         }
 
         .showcase-card {
             background: var(--glass-bg);
             border: 1px solid var(--glass-border);
-            border-radius: 20px;
+            border-radius: 28px;
             overflow: hidden;
-            backdrop-filter: blur(10px);
-            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.4s;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.5s;
         }
 
         .showcase-card:hover {
-            transform: scale(1.03);
-            border-color: var(--accent);
+            transform: translateY(-8px);
+            border-color: var(--primary);
         }
 
-        /* Simulated Media Box using gradient placeholders for high visual polish without hard assets */
-        .card-image-placeholder {
-            height: 240px;
+        /* High-Definition Premium Media Containers */
+        .card-image-box {
+            height: 280px;
             width: 100%;
-            background: linear-gradient(135deg, #0a192f 0%, #0d2b45 100%);
+            overflow: hidden;
             position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            background-color: #050d1a;
         }
 
-        .card-image-placeholder::before {
-            content: 'SPECIES METADATA SIGNAL';
-            font-size: 0.8rem;
-            letter-spacing: 3px;
-            color: rgba(0, 255, 136, 0.3);
-            font-weight: bold;
+        .card-image-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .showcase-card:hover .card-image-box img {
+            transform: scale(1.06);
+        }
+
+        /* Linear Dark Vignette Blend Overlay over images */
+        .card-image-box::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; width: 100%; height: 40%;
+            background: linear-gradient(to top, var(--bg-dark), transparent);
         }
 
         .card-content {
-            padding: 2rem;
+            padding: 2.5rem;
+            background: linear-gradient(to bottom, transparent, rgba(4, 10, 20, 0.3));
         }
 
+        /* High-End Status Metadata Badges */
         .status-badge {
             display: inline-block;
-            padding: 0.25rem 0.75rem;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: bold;
-            letter-spacing: 1px;
+            padding: 0.35rem 0.9rem;
+            border-radius: 100px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 2px;
             text-transform: uppercase;
-            margin-bottom: 1rem;
-            background: rgba(255, 71, 87, 0.2);
-            color: #ff4757;
-            border: 1px solid rgba(255, 71, 87, 0.3);
+            margin-bottom: 1.25rem;
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.15);
         }
 
         .status-badge.vulnerable {
-            background: rgba(255, 165, 0, 0.2);
-            color: #ffa500;
-            border: 1px solid rgba(255, 165, 0, 0.3);
+            background: rgba(245, 158, 11, 0.1);
+            color: #f59e0b;
+            border: 1px solid rgba(245, 158, 11, 0.15);
         }
 
         .card-content h2 {
-            font-size: 1.6rem;
-            margin-bottom: 0.5rem;
+            font-size: 1.5rem;
+            margin-bottom: 0.75rem;
+            font-weight: 600;
+            letter-spacing: -0.01em;
         }
 
         .card-content p {
-            color: #a0aec0;
-            font-size: 0.95rem;
-            line-height: 1.5;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            line-height: 1.6;
         }
     </style>
 </head>
 <body>
 
     <nav>
-        <div class="logo">TERRA</div>
+        <div class="logo-container">
+            <div class="logo">TERRA</div>
+            <div class="logo-dot"></div>
+        </div>
         <ul class="nav-links">
-            <li><a href="index.html">Home</a></li>
+            <li><a href="index.html">Archive</a></li>
             <li><a href="wildlife.html" class="active">Wildlife</a></li>
-            <li><a href="conservation.html">Conservation</a></li>
+            <li><a href="conservation.html">Nodes</a></li>
         </ul>
     </nav>
 
     <main>
         <div class="header-title">
-            <h1>Ecosystem Profiles</h1>
-            <p>Archiving and protecting Earth's critically vulnerable lifeforms.</p>
+            <h1>Ecosystem <span>Profiles</span></h1>
+            <p>Archiving real-time population structural metadata and tracking critical migratory behaviors across vulnerable world biomes.</p>
         </div>
 
         <div class="gallery-grid">
             <div class="showcase-card">
-                <div class="card-image-placeholder" style="background: linear-gradient(135deg, #1e3c72, #2a5298);"></div>
+                <div class="card-image-box">
+                    <img src="http://googleusercontent.com/image_collection/image_retrieval/3545053071295768978_0" alt="Amur Leopard">
+                </div>
                 <div class="card-content">
                     <span class="status-badge">Critically Endangered</span>
                     <h2>Amur Leopard</h2>
-                    <p>With fewer than 100 individuals remaining in the wild, these masterful predators survive along the harsh border regions of Russia and China.</p>
+                    <p>With fewer than 100 individuals remaining in the wild, these highly adapted, solitary predators survive along the mountainous temperate forest border regions of the Far East.</p>
                 </div>
             </div>
 
             <div class="showcase-card">
-                <div class="card-image-placeholder" style="background: linear-gradient(135deg, #0f2027, #203a43);"></div>
+                <div class="card-image-box">
+                    <img src="http://googleusercontent.com/image_collection/image_retrieval/10417939590693356296_0" alt="African Elephant">
+                </div>
                 <div class="card-content">
                     <span class="status-badge vulnerable">Vulnerable</span>
                     <h2>African Elephant</h2>
-                    <p>Vital keystones of their ecosystem, engineering entire landscapes, elephants continue to face heavy territory shrinkage and fragmentation.</p>
+                    <p>Vital keystones of their native biomes, engineering entire savannah landscapes. Heavy fragmentation of historical territory continues to present severe structural challenges.</p>
                 </div>
             </div>
 
             <div class="showcase-card">
-                <div class="card-image-placeholder" style="background: linear-gradient(135deg, #11998e, #38ef7d);"></div>
+                <div class="card-image-box">
+                    <img src="http://googleusercontent.com/image_collection/image_retrieval/16165216878933283381_0" alt="Green Sea Turtle">
+                </div>
                 <div class="card-content">
                     <span class="status-badge">Endangered</span>
                     <h2>Green Sea Turtle</h2>
-                    <p>Navigating complex oceanic matrix streams, these ancient marine species are constantly challenged by human development and changing coastal currents.</p>
+                    <p>Navigating complex marine currents for thousands of miles, these ancient ocean wanderers rely directly on the micro-stability of coastal reef architectures and protected nesting beaches.</p>
                 </div>
             </div>
         </div>
