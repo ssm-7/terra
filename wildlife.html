@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TERRA | Wildlife Gallery</title>
+    <style>
+        :root {
+            --primary: #00ff88;
+            --accent: #00e1ff;
+            --bg-dark: #050b14;
+            --glass-bg: rgba(10, 25, 47, 0.4);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --text-light: #f3f4f6;
+        }
+
+        * {
+            margin: 0; padding: 0; box-sizing: border-box;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        nav {
+            position: fixed; top: 0; width: 100%; display: flex;
+            justify-content: space-between; align-items: center;
+            padding: 1.5rem 5%; background: rgba(5, 11, 20, 0.7);
+            backdrop-filter: blur(12px); border-bottom: 1px solid var(--glass-border);
+            z-index: 10;
+        }
+
+        .logo {
+            font-size: 1.8rem; font-weight: 800; letter-spacing: 4px;
+            background: linear-gradient(45deg, var(--primary), var(--accent));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+
+        .nav-links { display: flex; list-style: none; gap: 2rem; }
+        .nav-links a { color: var(--text-light); text-decoration: none; font-weight: 500; transition: color 0.3s; position: relative; }
+        .nav-links a::after { content: ''; position: absolute; width: 0; height: 2px; bottom: -5px; left: 0; background-color: var(--primary); transition: width 0.3s; }
+        .nav-links a.active::after { width: 100%; }
+
+        /* Main Container */
+        main {
+            padding: 8rem 5% 4rem 5%;
+            position: relative;
+            z-index: 2;
+        }
+
+        .header-title {
+            margin-bottom: 3rem;
+            text-align: center;
+        }
+
+        .header-title h1 {
+            font-size: 3rem;
+            letter-spacing: 2px;
+            margin-bottom: 0.5rem;
+        }
+
+        .header-title p {
+            color: #a0aec0;
+        }
+
+        /* Showcase Dynamic Grid */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2.5rem;
+        }
+
+        .showcase-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.4s;
+        }
+
+        .showcase-card:hover {
+            transform: scale(1.03);
+            border-color: var(--accent);
+        }
+
+        /* Simulated Media Box using gradient placeholders for high visual polish without hard assets */
+        .card-image-placeholder {
+            height: 240px;
+            width: 100%;
+            background: linear-gradient(135deg, #0a192f 0%, #0d2b45 100%);
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .card-image-placeholder::before {
+            content: 'SPECIES METADATA SIGNAL';
+            font-size: 0.8rem;
+            letter-spacing: 3px;
+            color: rgba(0, 255, 136, 0.3);
+            font-weight: bold;
+        }
+
+        .card-content {
+            padding: 2rem;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+            background: rgba(255, 71, 87, 0.2);
+            color: #ff4757;
+            border: 1px solid rgba(255, 71, 87, 0.3);
+        }
+
+        .status-badge.vulnerable {
+            background: rgba(255, 165, 0, 0.2);
+            color: #ffa500;
+            border: 1px solid rgba(255, 165, 0, 0.3);
+        }
+
+        .card-content h2 {
+            font-size: 1.6rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .card-content p {
+            color: #a0aec0;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="logo">TERRA</div>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="wildlife.html" class="active">Wildlife</a></li>
+            <li><a href="conservation.html">Conservation</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <div class="header-title">
+            <h1>Ecosystem Profiles</h1>
+            <p>Archiving and protecting Earth's critically vulnerable lifeforms.</p>
+        </div>
+
+        <div class="gallery-grid">
+            <div class="showcase-card">
+                <div class="card-image-placeholder" style="background: linear-gradient(135deg, #1e3c72, #2a5298);"></div>
+                <div class="card-content">
+                    <span class="status-badge">Critically Endangered</span>
+                    <h2>Amur Leopard</h2>
+                    <p>With fewer than 100 individuals remaining in the wild, these masterful predators survive along the harsh border regions of Russia and China.</p>
+                </div>
+            </div>
+
+            <div class="showcase-card">
+                <div class="card-image-placeholder" style="background: linear-gradient(135deg, #0f2027, #203a43);"></div>
+                <div class="card-content">
+                    <span class="status-badge vulnerable">Vulnerable</span>
+                    <h2>African Elephant</h2>
+                    <p>Vital keystones of their ecosystem, engineering entire landscapes, elephants continue to face heavy territory shrinkage and fragmentation.</p>
+                </div>
+            </div>
+
+            <div class="showcase-card">
+                <div class="card-image-placeholder" style="background: linear-gradient(135deg, #11998e, #38ef7d);"></div>
+                <div class="card-content">
+                    <span class="status-badge">Endangered</span>
+                    <h2>Green Sea Turtle</h2>
+                    <p>Navigating complex oceanic matrix streams, these ancient marine species are constantly challenged by human development and changing coastal currents.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+</body>
+</html>
