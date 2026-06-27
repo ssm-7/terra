@@ -244,101 +244,138 @@
     </section>
 
     <script>
-        // --- JAVASCRIPT: THREE.JS EARTH & CANVAS BACKGROUNDS ---
-        const container = document.getElementById('canvas-container');
-        
-        // Scene Setup
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(window.devicePixelRatio);
-        container.appendChild(renderer.domElement);
+       // --- UPDATED JAVASCRIPT: HIGH-FIDELITY INTERACTIVE 3D EARTH ---
+const container = document.getElementById('canvas-container');
 
-        // Position camera right-centered for cinematic desktop view
-        camera.position.z = 6;
-        if(window.innerWidth > 768) {
-            camera.position.x = -1.5; 
-        }
+// 1. Scene & Renderer Setup
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // Caps ratio at 2 for performance
+container.appendChild(renderer.domElement);
 
-        // Lighting
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
-        scene.add(ambientLight);
+camera.position.z = 6;
+if(window.innerWidth > 768) {
+    camera.position.x = -1.5; 
+}
 
-        const directionalLight = new THREE.DirectionalLight(0x00ff88, 0.8);
-        directionalLight.position.set(5, 3, 5);
-        scene.add(directionalLight);
+// 2. Cinematic Lighting Setup
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.3); // Soft environmental light
+scene.add(ambientLight);
 
-        const blueLight = new THREE.DirectionalLight(0x00e1ff, 0.5);
-        blueLight.position.set(-5, -3, -5);
-        scene.add(blueLight);
+// Primary Sun Light (Emphasizes edges with a sharp green/cyan tint)
+const sunLight = new THREE.DirectionalLight(0x00ff88, 1.5);
+sunLight.position.set(5, 3, 5);
+scene.add(sunLight);
 
-        // 3D Earth (Wireframe / Point style for sci-fi, cinematic data aesthetic)
-        const earthGeometry = new THREE.SphereGeometry(2, 45, 45);
-        const earthMaterial = new THREE.MeshStandardMaterial({
-            color: 0x112233,
-            wireframe: true,
-            transparent: true,
-            opacity: 0.15
-        });
-        const earthMesh = new THREE.Mesh(earthGeometry, earthMaterial);
-        scene.add(earthMesh);
+// Secondary Rim Light (Fills in shadows with a deep space-blue hue)
+const rimLight = new THREE.DirectionalLight(0x00e1ff, 1.0);
+rimLight.position.set(-5, -3, -5);
+scene.add(rimLight);
 
-        // Particle Points Layer wrapping Earth
-        const pointGeometry = new THREE.SphereGeometry(2.03, 50, 50);
-        const pointMaterial = new THREE.PointsMaterial({
-            size: 0.03,
-            color: 0x00ff88,
-            transparent: true,
-            opacity: 0.85
-        });
-        const earthPoints = new THREE.Points(pointGeometry, pointMaterial);
-        scene.add(earthPoints);
+// 3. Creating a High-Fidelity Earth Mesh
+const earthGeometry = new THREE.SphereGeometry(2, 64, 64); // Increased segments for perfect smoothness
 
-        // Starfield / Ambient Particles
-        const starsGeometry = new THREE.BufferGeometry();
-        const starsCount = 600;
-        const starPositions = new Float32Array(starsCount * 3);
+// Using high-performance Procedural Texturing via Canvas to generate high-fidelity vectors on the fly
+const canvasTex = document.createElement('canvas');
+canvasTex.width = 2048;
+canvasTex.height = 1024;
+const ctxTex = canvasTex.getContext('2d');
+ctxTex.fillStyle = '#0a1424';
+ctxTex.fillRect(0, 0, canvasTex.width, canvasTex.height);
 
-        for(let i=0; i < starsCount * 3; i++) {
-            starPositions[i] = (Math.random() - 0.5) * 15;
-        }
+// Procedurally sketch abstract continental fragments
+ctxTex.fillStyle = '#00ff88';
+for(let i=0; i<120; i++) {
+    ctxTex.beginPath();
+    ctxTex.arc(Math.random()*canvasTex.width, Math.random()*canvasTex.height, Math.random()*90 + 10, 0, Math.PI*2);
+    ctxTex.fill();
+}
 
-        starsGeometry.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
-        const starsMaterial = new THREE.PointsMaterial({
-            size: 0.02,
-            color: 0x00e1ff,
-            transparent: true,
-            opacity: 0.6
-        });
-        const starField = new THREE.Points(starsGeometry, starsMaterial);
-        scene.add(starField);
+const texture = new THREE.CanvasTexture(canvasTex);
 
-        // Animation Loop
-        function animate() {
-            requestAnimationFrame(animate);
+const earthMaterial = new THREE.MeshStandardMaterial({
+    map: texture,
+    roughness: 0.4,
+    metalness: 0.1,
+    bumpMap: texture,
+    bumpScale: 0.05
+});
 
-            // Subtle Rotations
-            earthMesh.rotation.y += 0.0015;
-            earthPoints.rotation.y += 0.0012;
-            earthPoints.rotation.x += 0.0003;
-            starField.rotation.y -= 0.0003;
+const earthMesh = new THREE.Mesh(earthGeometry, earthMaterial);
+scene.add(earthMesh);
 
-            renderer.render(scene, camera);
-        }
-        animate();
+// 4. Fine Digital Data Particle Overlay
+const pointGeometry = new THREE.SphereGeometry(2.04, 60, 60);
+const pointMaterial = new THREE.PointsMaterial({
+    size: 0.025,
+    color: 0x00e1ff,
+    transparent: true,
+    opacity: 0.4
+});
+const earthPoints = new THREE.Points(pointGeometry, pointMaterial);
+scene.add(earthPoints);
 
-        // Responsive handling
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            if(window.innerWidth > 768) {
-                camera.position.x = -1.5;
-            } else {
-                camera.position.x = 0;
-            }
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        });
+// Ambient Starfield Coordinates
+const starsGeometry = new THREE.BufferGeometry();
+const starsCount = 400;
+const starPositions = new Float32Array(starsCount * 3);
+for(let i=0; i < starsCount * 3; i++) {
+    starPositions[i] = (Math.random() - 0.5) * 18;
+}
+starsGeometry.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
+const starsMaterial = new THREE.PointsMaterial({
+    size: 0.03,
+    color: 0xffffff,
+    transparent: true,
+    opacity: 0.5
+});
+const starField = new THREE.Points(starsGeometry, starsMaterial);
+scene.add(starField);
+
+// 5. Interactive Mouse-Tracking Logic
+let mouseX = 0, mouseY = 0;
+let targetX = 0, targetY = 0;
+
+window.addEventListener('mousemove', (event) => {
+    // Normalize mouse positioning from -0.5 to 0.5
+    mouseX = (event.clientX / window.innerWidth) - 0.5;
+    mouseY = (event.clientY / window.innerHeight) - 0.5;
+});
+
+// 6. Animation Frame Engine Loop
+function animate() {
+    requestAnimationFrame(animate);
+
+    // Constant planetary rotation
+    earthMesh.rotation.y += 0.002;
+    earthPoints.rotation.y += 0.0015;
+
+    // Smooth physics interpolation (Easing mouse tracking)
+    targetX += (mouseX - targetX) * 0.05;
+    targetY += (mouseY - targetY) * 0.05;
+
+    // Subtle tilt response relative to cursor position
+    earthMesh.rotation.x = targetY * 0.5;
+    earthMesh.rotation.z = targetX * 0.2;
+    earthPoints.rotation.x = targetY * 0.5;
+
+    renderer.render(scene, camera);
+}
+animate();
+
+// Window Resize Safety Handler
+window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    if(window.innerWidth > 768) {
+        camera.position.x = -1.5;
+    } else {
+        camera.position.x = 0;
+    }
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+});
     </script>
 </body>
 </html>
