@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TERRA — Live Analytics</title>
+    <style>
+        :root {
+            --primary: #00ffaa;
+            --accent: #00e5ff;
+            --bg-dark: #03070c;
+            --glass-bg: rgba(4, 10, 20, 0.4);
+            --glass-border: rgba(255, 255, 255, 0.04);
+            --text-muted: #64748b;
+            --text-light: #f8fafc;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; }
+        body { background-color: var(--bg-dark); color: var(--text-light); min-height: 100vh; overflow-x: hidden; }
+
+        main { padding: 9rem 6% 4rem 6%; position: relative; z-index: 2; max-width: 1400px; margin: 0 auto; }
+        
+        /* --- GLOBAL NAVIGATION SYNC --- */
+        nav {
+            position: fixed; top: 0; width: 100%; display: flex; justify-content: space-between; align-items: center;
+            padding: 2rem 6%; background: linear-gradient(to bottom, rgba(3, 7, 12, 0.9), transparent);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); z-index: 10;
+        }
+        .logo-container { display: flex; align-items: center; gap: 1rem; }
+        .logo { font-size: 1.25rem; font-weight: 800; letter-spacing: 7px; color: var(--text-light); text-decoration: none; }
+        .logo-dot { width: 6px; height: 6px; background: var(--primary); border-radius: 50%; box-shadow: 0 0 10px var(--primary); }
+        .nav-links { display: flex; list-style: none; gap: 3rem; }
+        .nav-links a { color: var(--text-muted); text-decoration: none; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; transition: color 0.4s; }
+        .nav-links a:hover, .nav-links a.active { color: var(--text-light); }
+
+        .dashboard-layout { display: grid; grid-template-columns: 2fr 1fr; gap: 3rem; margin-top: 2rem; }
+        .chart-panel { background: var(--glass-bg); border: 1px solid var(--glass-border); padding: 2.5rem; border-radius: 28px; backdrop-filter: blur(20px); }
+        .chart-panel h2 { font-size: 1.4rem; font-weight: 500; margin-bottom: 1.5rem; letter-spacing: -0.01em; }
+        
+        canvas #telemetry-graph { width: 100%; height: 320px; background: rgba(0,0,0,0.2); border-radius: 12px; }
+
+        .sidebar-metrics { display: flex; flex-direction: column; gap: 2rem; }
+        .sub-box { background: var(--glass-bg); border: 1px solid var(--glass-border); padding: 2rem; border-radius: 20px; }
+        .sub-box h4 { font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); letter-spacing: 2px; margin-bottom: 0.5rem; }
+        .sub-box .data-stream { font-size: 1.8rem; font-weight: 700; color: #fff; }
+
+        @media(max-width: 950px) { .dashboard-layout { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="logo-container">
+            <a href="index.html" class="logo">TERRA</a>
+            <div class="logo-dot"></div>
+        </div>
+        <ul class="nav-links">
+            <li><a href="index.html">Archive</a></li>
+            <li><a href="wildlife.html">Wildlife</a></li>
+            <li><a href="biomes.html">Biomes</a></li>
+            <li><a href="conservation.html">Nodes</a></li>
+            <li><a href="analytics.html" class="active">Analytics</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <div class="dashboard-layout">
+            <div class="chart-panel">
+                <h2>Atmospheric Particulate Feed (Carbon Displacement)</h2>
+                <canvas id="telemetry-graph" width="800" height="320"></canvas>
+            </div>
+
+            <div class="sidebar-metrics">
+                <div class="sub-box">
+                    <h4>Global Encryption Sync</h4>
+                    <div class="data-stream" id="sync-val">99.98%</div>
+                </div>
+                <div class="sub-box">
+                    <h4>Active Ranger Signal Feeds</h4>
+                    <div class="data-stream" style="color: var(--primary);">4,812 Nodes</div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const canvas = document.getElementById('telemetry-graph');
+        const ctx = canvas.getContext('2d');
+
+        // Dynamic coordinate data flow array
+        const points = Array.from({length: 20}, (_, i) => ({
+            x: (800 / 19) * i,
+            y: 160 + (Math.random() - 0.5) * 80
+        }));
+
+        function drawGraph() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Shift coordinate lines to simulate active streaming data feeds
+            for(let i=0; i<points.length; i++) {
+                points[i].y += (Math.random() - 0.5) * 4;
+                if(points[i].y < 40) points[i].y = 40;
+                if(points[i].y > 280) points[i].y = 280;
+            }
+
+            // Draw Area Glow Background Underneath Line Graph
+            ctx.beginPath();
+            ctx.moveTo(0, canvas.height);
+            for(let p of points) ctx.lineTo(p.x, p.y);
+            ctx.lineTo(canvas.width, canvas.height);
+            let gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            gradient.addColorStop(0, 'rgba(0, 229, 255, 0.08)');
+            gradient.addColorStop(1, 'transparent');
+            ctx.fillStyle = gradient;
+            ctx.fill();
+
+            // Core Technical Stroke Path
+            ctx.beginPath();
+            ctx.moveTo(points[0].x, points[0].y);
+            for(let i = 1; i < points.length; i++) {
+                ctx.lineTo(points[i].x, points[i].y);
+            }
+            ctx.strokeStyle = '#00ffaa';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+
+            requestAnimationFrame(drawGraph);
+        }
+        drawGraph();
+
+        // Live updating metadata string tracking simulation
+        setInterval(() => {
+            document.getElementById('sync-val').innerText = (99.90 + Math.random() * 0.09).toFixed(2) + "%";
+        }, 2000);
+    </script>
+</body>
+</html>

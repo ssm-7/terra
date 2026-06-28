@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TERRA — Biosphere Biomes</title>
+    <style>
+        :root {
+            --primary: #00ffaa;
+            --accent: #00e5ff;
+            --bg-dark: #03070c;
+            --glass-bg: rgba(4, 10, 20, 0.4);
+            --glass-border: rgba(255, 255, 255, 0.04);
+            --text-muted: #64748b;
+            --text-light: #f8fafc;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; }
+        body { background-color: var(--bg-dark); color: var(--text-light); min-height: 100vh; overflow-x: hidden; }
+
+        #canvas-3d-grid { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1; }
+
+        /* --- GLOBAL NAVIGATION SYNC --- */
+        nav {
+            position: fixed; top: 0; width: 100%; display: flex; justify-content: space-between; align-items: center;
+            padding: 2rem 6%; background: linear-gradient(to bottom, rgba(3, 7, 12, 0.9), transparent);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); z-index: 10;
+        }
+        .logo-container { display: flex; align-items: center; gap: 1rem; }
+        .logo { font-size: 1.25rem; font-weight: 800; letter-spacing: 7px; color: var(--text-light); text-decoration: none; }
+        .logo-dot { width: 6px; height: 6px; background: var(--primary); border-radius: 50%; box-shadow: 0 0 10px var(--primary); }
+        .nav-links { display: flex; list-style: none; gap: 3rem; }
+        .nav-links a { color: var(--text-muted); text-decoration: none; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; transition: color 0.4s; }
+        .nav-links a:hover, .nav-links a.active { color: var(--text-light); }
+
+        main { padding: 9rem 6% 6rem 6%; position: relative; z-index: 2; max-width: 1400px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; pointer-events: none; }
+        .left-col { max-width: 500px; pointer-events: auto; }
+        .right-col { display: flex; flex-direction: column; gap: 2rem; pointer-events: auto; max-width: 450px; justify-self: end; }
+
+        .header-title h1 { font-size: 2.75rem; letter-spacing: -0.02em; margin-bottom: 1rem; font-weight: 400; }
+        .header-title h1 span { font-weight: 700; }
+        .header-title p { color: var(--text-muted); line-height: 1.6; margin-bottom: 2rem; }
+
+        .biome-card { background: var(--glass-bg); border: 1px solid var(--glass-border); backdrop-filter: blur(20px); padding: 2rem; border-radius: 20px; transition: border-color 0.4s; }
+        .biome-card:hover { border-color: var(--primary); }
+        .biome-card h3 { font-size: 1.2rem; margin-bottom: 0.5rem; color: #fff; }
+        .biome-card p { font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; }
+        .stability-index { display: inline-flex; align-items: center; gap: 0.5rem; margin-top: 1rem; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--accent); }
+
+        @media (max-width: 900px) { main { grid-template-columns: 1fr; } .right-col { justify-self: start; } }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+
+    <div id="canvas-3d-grid"></div>
+
+    <nav>
+        <div class="logo-container">
+            <a href="index.html" class="logo">TERRA</a>
+            <div class="logo-dot"></div>
+        </div>
+        <ul class="nav-links">
+            <li><a href="index.html">Archive</a></li>
+            <li><a href="wildlife.html">Wildlife</a></li>
+            <li><a href="biomes.html" class="active">Biomes</a></li>
+            <li><a href="conservation.html">Nodes</a></li>
+            <li><a href="analytics.html">Analytics</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <div class="left-col">
+            <div class="header-title">
+                <h1>Global <span>Biomes</span></h1>
+                <p>Analyzing architectural structural layers across global primary vital zones through dynamic topographic projection grids.</p>
+            </div>
+            <div class="biome-card">
+                <h3>Boreal Forest Grid</h3>
+                <p>Dense northern carbon sinks showing severe thermal fluctuations along latitude coordinate boundaries.</p>
+                <div class="stability-index">Stability Factor: 74.2%</div>
+            </div>
+        </div>
+
+        <div class="right-col">
+            <div class="biome-card">
+                <h3>Coral Shelf Matrix</h3>
+                <p>Hyper-vulnerable aquatic arrays facing localized acidification surges. Actively monitoring calcium structures.</p>
+                <div class="stability-index" style="color: #ef4444;">Stability Factor: 41.8%</div>
+            </div>
+            <div class="biome-card">
+                <h3>Amazonian Canopy Basin</h3>
+                <p>The primary oxygen exchange network. Telemetry nodes are currently mapping moisture loop fragmentation levels.</p>
+                <div class="stability-index" style="color: #f59e0b;">Stability Factor: 59.5%</div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const container = document.getElementById('canvas-3d-grid');
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        container.appendChild(renderer.domElement);
+
+        camera.position.set(0, 3.5, 5);
+        camera.lookAt(0, 0, 0);
+
+        // Volumetric Undulating Mesh Generation
+        const gridX = 45, gridZ = 45;
+        const geometry = new THREE.PlaneGeometry(8, 8, gridX, gridZ);
+        geometry.rotateX(-Math.PI / 2); // Flatten horizontally
+
+        const material = new THREE.MeshBasicMaterial({ color: 0x00ffaa, wireframe: true, transparent: true, opacity: 0.08 });
+        const mesh = new THREE.Mesh(geometry, material);
+        scene.add(mesh);
+
+        // Particle Overlay on vertices
+        const pointsMat = new THREE.PointsMaterial({ size: 0.02, color: 0x00e5ff, transparent: true, opacity: 0.4 });
+        const points = new THREE.Points(geometry, pointsMat);
+        scene.add(points);
+
+        let clock = new THREE.Clock();
+
+        function animate() {
+            requestAnimationFrame(animate);
+            const time = clock.getElapsedTime() * 0.4;
+            
+            // Access and modulate plane geometry heights to simulate digital telemetry waves
+            const position = geometry.attributes.position;
+            for (let i = 0; i < position.count; i++) {
+                const x = position.getX(i);
+                const z = position.getZ(i);
+                // Advanced wave noise generation formula
+                const y = Math.sin(x * 1.2 + time) * Math.cos(z * 1.2 + time) * 0.28;
+                position.setY(i, y);
+            }
+            position.needsUpdate = true;
+
+            mesh.rotation.y += 0.0008;
+            points.rotation.y += 0.0008;
+
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+</html>
