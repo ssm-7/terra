@@ -3,69 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TERRA — Planetary Archive Platform</title>
+    <title>TERRA — Live Analytics</title>
     <style>
         :root {
             --primary: #00ffaa;
             --accent: #00e5ff;
             --bg-dark: #03070c;
-            --glass-bg: rgba(4, 10, 20, 0.25);
+            --glass-bg: rgba(4, 10, 20, 0.4);
             --glass-border: rgba(255, 255, 255, 0.04);
             --text-muted: #64748b;
             --text-light: #f8fafc;
         }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; }
+        body { background-color: var(--bg-dark); color: var(--text-light); min-height: 100vh; overflow-x: hidden; }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif; }
-        body { background-color: var(--bg-dark); color: var(--text-light); overflow-x: hidden; min-height: 100vh; letter-spacing: -0.01em; }
-
-        body::before {
-            content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle at 80% 20%, rgba(0, 255, 170, 0.03) 0%, transparent 50%),
-                        radial-gradient(circle at 10% 80%, rgba(0, 229, 255, 0.02) 0%, transparent 40%);
-            pointer-events: none; z-index: 2;
-        }
-
-        #canvas-container { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1; }
-
-        /* --- GLOBAL PREMIUM NAVIGATION --- */
+        main { padding: 9rem 6% 4rem 6%; position: relative; z-index: 2; max-width: 1400px; margin: 0 auto; }
+        
+        /* --- GLOBAL NAVIGATION --- */
         nav {
             position: fixed; top: 0; width: 100%; display: flex; justify-content: space-between; align-items: center;
-            padding: 2rem 6%; background: linear-gradient(to bottom, rgba(3, 7, 12, 0.8), transparent);
+            padding: 2rem 6%; background: linear-gradient(to bottom, rgba(3, 7, 12, 0.9), transparent);
             backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); z-index: 10;
         }
         .logo-container { display: flex; align-items: center; gap: 1rem; }
         .logo { font-size: 1.25rem; font-weight: 800; letter-spacing: 7px; color: var(--text-light); text-decoration: none; }
         .logo-dot { width: 6px; height: 6px; background: var(--primary); border-radius: 50%; box-shadow: 0 0 10px var(--primary); }
-        .nav-links { display: flex; list-style: none; gap: 3rem; }
-        .nav-links a { color: var(--text-muted); text-decoration: none; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; transition: color 0.4s ease; }
+        .nav-links { display: flex; list-style: none; gap: 2rem; }
+        .nav-links a { color: var(--text-muted); text-decoration: none; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; transition: color 0.4s; }
         .nav-links a:hover, .nav-links a.active { color: var(--text-light); }
 
-        /* --- LAYOUT AND HERO COMPONENTS --- */
-        .hero { position: relative; min-height: 100vh; display: flex; align-items: center; padding: 0 8%; z-index: 3; pointer-events: none; }
-        .hero-content { max-width: 540px; background: var(--glass-bg); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); border: 1px solid var(--glass-border); padding: 4rem; border-radius: 32px; box-shadow: 0 40px 100px rgba(0, 0, 0, 0.8); pointer-events: auto; }
+        .dashboard-layout { display: grid; grid-template-columns: 2fr 1fr; gap: 3rem; margin-top: 2rem; }
+        .chart-panel { background: var(--glass-bg); border: 1px solid var(--glass-border); padding: 2.5rem; border-radius: 28px; backdrop-filter: blur(20px); width: 100%; overflow: hidden; }
+        .chart-panel h2 { font-size: 1.4rem; font-weight: 500; margin-bottom: 1.5rem; letter-spacing: -0.01em; }
         
-        .system-status { display: flex; align-items: center; gap: 0.5rem; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 3px; color: var(--primary); margin-bottom: 1.5rem; font-weight: 700; }
-        .status-pulse { width: 4px; height: 4px; background: var(--primary); border-radius: 50%; animation: pulse 2s infinite; }
+        #telemetry-graph { width: 100% !important; height: auto !important; max-height: 320px; background: rgba(0,0,0,0.2); border-radius: 12px; display: block; }
 
-        .hero h1 { font-size: 3rem; line-height: 1.15; margin-bottom: 1.5rem; font-weight: 400; letter-spacing: -0.03em; }
-        .hero h1 span { font-weight: 700; background: linear-gradient(to right, #fff, #8796a8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .hero p { font-size: 0.95rem; line-height: 1.7; color: var(--text-muted); margin-bottom: 2.5rem; }
+        .sidebar-metrics { display: flex; flex-direction: column; gap: 2rem; }
+        .sub-box { background: var(--glass-bg); border: 1px solid var(--glass-border); padding: 2rem; border-radius: 20px; }
+        .sub-box h4 { font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); letter-spacing: 2px; margin-bottom: 0.5rem; }
+        .sub-box .data-stream { font-size: 1.8rem; font-weight: 700; color: #fff; }
 
-        .cta-btn { display: inline-flex; align-items: center; gap: 1rem; padding: 1.1rem 2.5rem; background: #fff; color: #000; font-weight: 700; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 2px; text-decoration: none; border-radius: 100px; transition: transform 0.3s, box-shadow 0.3s, background-color 0.3s; }
-        .cta-btn:hover { transform: translateY(-2px); background: var(--primary); box-shadow: 0 15px 30px rgba(0, 255, 170, 0.2); }
-
-        .metrics-bar { position: absolute; bottom: 3rem; right: 6%; display: flex; gap: 4rem; z-index: 3; background: var(--glass-bg); padding: 1.5rem 3rem; border-radius: 16px; border: 1px solid var(--glass-border); backdrop-filter: blur(20px); }
-        .metric-val { font-size: 1.5rem; font-weight: 700; color: var(--text-light); }
-        .metric-lbl { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); margin-top: 0.25rem; }
-
-        @keyframes pulse { 0%, 100% { transform: scale(0.9); opacity: 0.4; } 50% { transform: scale(1.2); opacity: 1; box-shadow: 0 0 12px var(--primary); } }
-        @media (max-width: 900px) { .metrics-bar { display: none; } .hero-content { padding: 2.5rem; margin-top: 4rem; } .hero h1 { font-size: 2.25rem; } }
+        @media(max-width: 950px) {
+            nav { flex-direction: column; gap: 1rem; padding: 1.2rem 5%; }
+            .nav-links { gap: 1rem; flex-wrap: wrap; justify-content: center; }
+            main { padding: 10rem 5% 4rem 5% !important; }
+            .dashboard-layout { grid-template-columns: 1fr; gap: 2rem; }
+            .chart-panel { padding: 1.5rem; border-radius: 20px; }
+            .chart-panel h2 { font-size: 1.1rem; }
+        }
     </style>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 <body>
-
-    <div id="canvas-container"></div>
 
     <nav>
         <div class="logo-container">
@@ -77,87 +65,64 @@
             <li><a href="wildlife.html">Wildlife</a></li>
             <li><a href="biomes.html">Biomes</a></li>
             <li><a href="conservation.html">Nodes</a></li>
-            <li><a href="analytics.html">Analytics</a></li>
+            <li><a href="analytics.html" class="active">Analytics</a></li>
         </ul>
     </nav>
 
-    <section class="hero">
-        <div class="hero-content">
-            <div class="system-status"><div class="status-pulse"></div>Telemetry Online</div>
-            <h1>The structural index of <span>planetary vitality.</span></h1>
-            <p>An immersive digital twin network compiling high-frequency biosphere observation telemetry. Synthesizing fragile ecosystem matrices into active structural conservation vectors.</p>
-            <a href="wildlife.html" class="cta-btn">
-                Enter Index 
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3.33334 8H12.6667" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 3.33334L12.6667 8L8 12.6667" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </a>
-        </div>
-    </section>
+    <main>
+        <div class="dashboard-layout">
+            <div class="chart-panel">
+                <h2>Atmospheric Particulate Feed (Carbon Displacement)</h2>
+                <canvas id="telemetry-graph" width="800" height="320"></canvas>
+            </div>
 
-    <div class="metrics-bar">
-        <div class="metric-item"><div class="metric-val" id="m1">141.2</div><div class="metric-lbl">Protected Biomes</div></div>
-        <div class="metric-item"><div class="metric-val" id="m2">-4.12%</div><div class="metric-lbl">Deforestation Delta</div></div>
-    </div>
+            <div class="sidebar-metrics">
+                <div class="sub-box">
+                    <h4>Global Encryption Sync</h4>
+                    <div class="data-stream" id="sync-val">99.98%</div>
+                </div>
+                <div class="sub-box">
+                    <h4>Active Ranger Signal Feeds</h4>
+                    <div class="data-stream" style="color: var(--primary);">4,812 Nodes</div>
+                </div>
+            </div>
+        </div>
+    </main>
 
     <script>
-        const container = document.getElementById('canvas-container');
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-        
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-        container.appendChild(renderer.domElement);
+        const canvas = document.getElementById('telemetry-graph');
+        const ctx = canvas.getContext('2d');
 
-        camera.position.z = 5.5;
-        if(window.innerWidth > 900) camera.position.x = -1.2;
+        const points = Array.from({length: 20}, (_, i) => ({
+            x: (800 / 19) * i, y: 160 + (Math.random() - 0.5) * 80
+        }));
 
-        const particleCount = 4500;
-        const geometry = new THREE.BufferGeometry();
-        const positions = new Float32Array(particleCount * 3);
-        const colors = new Float32Array(particleCount * 3);
-        const colorCore = new THREE.Color('#00ffaa');
-        const colorAccent = new THREE.Color('#00e5ff');
+        function drawGraph() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        for(let i = 0; i < particleCount; i++) {
-            const phi = Math.acos(-1 + (2 * i) / particleCount);
-            const theta = Math.sqrt(particleCount * Math.PI) * phi;
-            const radius = 2.0 + (Math.random() * 0.04);
+            for(let i=0; i<points.length; i++) {
+                points[i].y += (Math.random() - 0.5) * 4;
+                if(points[i].y < 40) points[i].y = 40; if(points[i].y > 280) points[i].y = 280;
+            }
 
-            const x = radius * Math.sin(phi) * Math.cos(theta);
-            const y = radius * Math.sin(phi) * Math.sin(theta);
-            const z = radius * Math.cos(phi);
+            ctx.beginPath(); ctx.moveTo(0, canvas.height);
+            for(let p of points) ctx.lineTo(p.x, p.y);
+            ctx.lineTo(canvas.width, canvas.height);
+            let gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            gradient.addColorStop(0, 'rgba(0, 229, 255, 0.08)'); gradient.addColorStop(1, 'transparent');
+            ctx.fillStyle = gradient; ctx.fill();
 
-            positions[i*3] = x; positions[i*3+1] = y; positions[i*3+2] = z;
-            const mixedColor = colorCore.clone().lerp(colorAccent, (x + 2) / 4);
-            colors[i*3] = mixedColor.r; colors[i*3+1] = mixedColor.g; colors[i*3+2] = mixedColor.b;
+            ctx.beginPath(); ctx.moveTo(points[0].x, points[0].y);
+            for(let i = 1; i < points.length; i++) ctx.lineTo(points[i].x, points[i].y);
+            ctx.strokeStyle = '#00ffaa'; ctx.lineWidth = 3; ctx.stroke();
+
+            requestAnimationFrame(drawGraph);
         }
+        drawGraph();
 
-        geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-        geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-
-        const material = new THREE.PointsMaterial({ size: 0.024, vertexColors: true, transparent: true, opacity: 0.85, blending: THREE.AdditiveBlending });
-        const particleSphere = new THREE.Points(geometry, material);
-        scene.add(particleSphere);
-
-        let mouseX = 0, mouseY = 0, targetX = 0, targetY = 0;
-        window.addEventListener('mousemove', (e) => { mouseX = (e.clientX / window.innerWidth) - 0.5; mouseY = (e.clientY / window.innerHeight) - 0.5; });
-
-        setInterval(() => { document.getElementById('m1').innerText = (141.2 + (Math.random() * 0.4)).toFixed(1); }, 3000);
-
-        function animate() {
-            requestAnimationFrame(animate);
-            targetX += (mouseX - targetX) * 0.03; targetY += (mouseY - targetY) * 0.03;
-            particleSphere.rotation.y += 0.0012;
-            particleSphere.rotation.x = targetY * 0.4; particleSphere.rotation.z = targetX * 0.3;
-            renderer.render(scene, camera);
-        }
-        animate();
-
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.position.x = window.innerWidth > 900 ? -1.2 : 0;
-            camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight);
-        });
+        setInterval(() => {
+            document.getElementById('sync-val').innerText = (99.90 + Math.random() * 0.09).toFixed(2) + "%";
+        }, 2000);
     </script>
 </body>
 </html>
